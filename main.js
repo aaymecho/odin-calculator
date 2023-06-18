@@ -1,75 +1,99 @@
-const container = document.querySelector('.container')
-const calc_case = document.createElement('div')
-const lcd = document.createElement('div');
-let first = 0, op = 0, third = 0;
+const display = document.querySelector('#display');
+let firstNumber = '';
+let secondNumber = '';
+let currentOperator = '';
+let displayValue = '0';
 
-let buttons = [
-  'AC', '+/-', '%', '/',
-  '7', '8', '9', '*',
-  '4', '5', '6', '-',
-  '1', '2', '3', '+',
-  '0', '.', '='];
+updateDisplay();
 
-lcd.className = 'lcd';
-lcd.textContent = '0';
-calc_case.className = 'case';
+function updateDisplay() {
+  display.value = displayValue;
+}
 
-calc_case.appendChild(lcd);
-container.appendChild(calc_case);
+function addDecimal(number) {
+  if (currentOperator == '' && !displayValue.includes('.')) {
+    firstNumber += number;
+    displayValue = firstNumber;
+  } else if (currentOperator != '' && !displayValue.includes('.')) {
+    secondNumber += number;
+    displayValue = secondNumber;
+  }
+  updateDisplay();
+}
 
-for (let col = 0; col < 5; col++) {
-  const column = document.createElement('div');
-  column.className = 'column';
-  calc_case.appendChild(column);
-  for (let i = 0; i < 4; i++) {
-    if (buttons.length > 0) {
-      const btn = document.createElement("btn");
-      (buttons[0] < 10) ? btn.className = 'num' : btn.className = 'op';
-      btn.textContent = `${buttons[0]}`;
-      btn.addEventListener("click", () => {
-        console.log(btn.id);
-        if (btn.textContent < 10 && lcd.textContent.length < 9) {
-          if (lcd.textContent == 0) lcd.textContent = '';
-          lcd.textContent += btn.textContent;
-          if (op < 0) first = lcd.textContent;
-        }
-        else if (btn.textContent == 'AC') {
-          lcd.textContent = '0';
-          first = 0;
-          op = 0;
-          third = 0;
-        }
-        else if (btn.textContent == '+/-') {
-          lcd.textContent = -lcd.textContent;
-        }
-        else if (btn.textContent == '%') {
-          lcd.textContent = lcd.textContent / 100;
-          if (first < 0) first = lcd.textContent;
-          else if (first > 0) third = lcd.textContent;
+function changeSign() {
+  if (currentOperator == '') {
+    firstNumber = -firstNumber;
+    displayValue = firstNumber;
+  } else if (currentOperator != '') {
+    secondNumber = -secondNumber;
+    displayValue = secondNumber;
+  }
+  updateDisplay();
+}
 
-        }
-        else if (btn.textContent == '.' && !lcd.textContent.includes('.')) {
-          lcd.textContent += btn.textContent;
-        }
-        else if (['*', '+', '-', '/'].includes(btn.textContent)) {
-          if (op >= 0)
-            first = lcd.textContent;
-          op = btn.textContent;
-        }
-        else if (btn.textContent == '=') {
-          lcd.textContent = `${first} ${op} ${second}`;
-        }
-      })
-      column.appendChild(btn);
-      buttons.shift();
-    } else {
+function makePercent() {
+  displayValue /= 100;
+  updateDisplay();
+}
 
-    }
+function appendNumber(number) {
+  if (currentOperator == '') {
+    firstNumber += number;
+    displayValue = firstNumber;
+  } else if (currentOperator != '') {
+    secondNumber += number;
+    displayValue = secondNumber;
+  }
+  updateDisplay();
+}
+
+function clearDisplay() {
+  firstNumber = '';
+  secondNumber = '';
+  currentOperator = '';
+  displayValue = '0';
+  updateDisplay()
+}
+
+function setOperator(operator) {
+  if (currentOperator != '' && firstNumber != '' && secondNumber != '') {
+    calculate();
+    firstNumber = display.value;
+    secondNumber = '';
+  } else {
+    firstNumber = displayValue;
+  }
+  currentOperator = operator;
+}
+
+function operate(operator, a, b) {
+  switch (operator) {
+    case '+':
+      return a + b;
+    case '-':
+      return a - b;
+    case '*':
+      return a * b;
+    case '/':
+      return a / b;
+    default:
+      return 0;
   }
 }
 
+function calculate() {
+  const num1 = firstNumber * 1;
+  const num2 = secondNumber * 1;
+  const result = operate(currentOperator, num1, num2);
+  displayValue = result;
+  updateDisplay();
 
+  firstNumber = ``;
+  secondNumber = '';
+  currentOperator = '';
+}
 
+function backSpace() {
 
-calc_case.prepend(lcd);
-container.appendChild(calc_case);
+}
